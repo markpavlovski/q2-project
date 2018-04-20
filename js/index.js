@@ -6,8 +6,8 @@ var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 // custom global variables
 
-var group = new THREE.Group();
-var MovingCube;
+var pacman = new THREE.Group();
+var pacman;
 var collidableMeshList = [];
 
 var arrowList = [];
@@ -95,14 +95,30 @@ function init() {
 	// CUSTOM //
 	////////////
 
+	pacman. position.set(0,25.1,0)
+	scene.add(pacman)
+
 	var cubeGeometry = new THREE.CubeGeometry(50, 50, 50, 1, 1, 1);
 	var wireMaterial = new THREE.MeshBasicMaterial({
 		color: 0xff0000,
 		wireframe: true
 	});
 	MovingCube = new THREE.Mesh(cubeGeometry, wireMaterial);
-	MovingCube.position.set(0, 25.1, 0);
-	scene.add(MovingCube);
+	MovingCube.position.set(0, 0, 0);
+	pacman.add(MovingCube);
+
+
+	var colliderGeometry = new THREE.CubeGeometry(5, 50, 50, 1, 1, 1);
+	var colliderMaterial = new THREE.MeshBasicMaterial({
+		color: 0xfffff00,
+		wireframe: false,
+		transparent: true,
+		opacity: 0.2
+	});
+	LeftCollider = new THREE.Mesh(colliderGeometry, colliderMaterial);
+	LeftCollider.position.set(-25, 0, 0);
+	pacman.add(LeftCollider);
+
 
 	var wallGeometry = new THREE.CubeGeometry(100, 100, 20, 1, 1, 1);
 	var wallMaterial = new THREE.MeshBasicMaterial({
@@ -157,27 +173,27 @@ function update() {
 
 
 	let possiblePosition = {
-		left: MovingCube.position.clone() + unitDirections.left * moveDistance,
-		right: MovingCube.position.clone() + unitDirections.right * moveDistance,
-		up: MovingCube.position.clone() + unitDirections.up * moveDistance,
-		down: MovingCube.position.clone() + unitDirections.down * moveDistance
+		left: pacman.position.clone() + unitDirections.left * moveDistance,
+		right: pacman.position.clone() + unitDirections.right * moveDistance,
+		up: pacman.position.clone() + unitDirections.up * moveDistance,
+		down: pacman.position.clone() + unitDirections.down * moveDistance
 	}
 
 	if (keyboard.pressed("left")) {
-		MovingCube.position.x -= moveDistance * availableDirections.left;
+		pacman.position.x -= moveDistance * availableDirections.left;
 		lastDirection = 'left'
 	}
 	if (keyboard.pressed("right")) {
-		MovingCube.position.x += moveDistance * availableDirections.right;
+		pacman.position.x += moveDistance * availableDirections.right;
 		lastDirection = 'right'
 	}
 	if (keyboard.pressed("up")) {
-		MovingCube.position.z -= moveDistance * availableDirections.up;
+		pacman.position.z -= moveDistance * availableDirections.up;
 		lastDirection = 'up'
 
 	}
 	if (keyboard.pressed("down")) {
-		MovingCube.position.z += moveDistance * availableDirections.down;
+		pacman.position.z += moveDistance * availableDirections.down;
 		lastDirection = 'down'
 	}
 
@@ -187,7 +203,7 @@ function update() {
 	//   for increased collision accuracy, add more vertices to the cube;
 	//		for example, new THREE.CubeGeometry( 64, 64, 64, 8, 8, 8, wireMaterial )
 	//   HOWEVER: when the origin of the ray is within the target mesh, collisions do not occur
-	var originPoint = MovingCube.position.clone();
+	var originPoint = pacman.position.clone();
 
 	clearText();
 
