@@ -6,6 +6,7 @@ var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 // custom global variables
 
+
 var pacman = new THREE.Group();
 var pacman;
 var collidableMeshList = [];
@@ -26,6 +27,10 @@ const availableDirections = {
 }
 
 let lastDirection = null
+
+const COLLISION_THRESHOLD = 4
+
+
 
 init();
 animate();
@@ -110,7 +115,7 @@ function init() {
   pacman.add(MovingCube);
 
 
-  var colliderGeometry = new THREE.CubeGeometry(5, 50, 50, 1, 1, 1);
+  var colliderGeometry = new THREE.CubeGeometry(5, 50, 50, 8, 8, 8);
   var colliderMaterial = new THREE.MeshBasicMaterial({
     color: 0xfffff00,
     wireframe: false,
@@ -189,7 +194,7 @@ function update() {
 
 
   let possiblePosition = {
-    left: pacman.position.clone() + unitDirections.left * moveDistance,
+    left: pacman.position.clone().add(unitDirections.left) * moveDistance,
     right: pacman.position.clone() + unitDirections.right * moveDistance,
     up: pacman.position.clone() + unitDirections.up * moveDistance,
     down: pacman.position.clone() + unitDirections.down * moveDistance
@@ -223,20 +228,15 @@ function update() {
 
   clearText();
 
-  for (var vertexIndex = 0; vertexIndex < MovingCube.geometry.vertices.length; vertexIndex++) {
-    var localVertex = MovingCube.geometry.vertices[vertexIndex].clone();
-    var globalVertex = localVertex.applyMatrix4(MovingCube.matrix);
-    var directionVector = globalVertex.sub(MovingCube.position);
-
-    var ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
+    var ray = new THREE.Raycaster(pacman.position.clone().addScaledVector(unitDirections.left,25) , unitDirections.left);
     var collisionResults = ray.intersectObjects(collidableMeshList);
-    if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
-      console.log(lastDirection);
-      console.log(availableDirections);
-      availableDirections[lastDirection] = false;
+		console.log(collisionResults[0].distance)
+
+    if (collisionResults.length > 0 && collisionResults[0].distance < COLLISION_THRESHOLD) {
       appendText(" Hit ");
+			availableDirections.left= false
     }
-  }
+
 
   controls.update();
   stats.update();
