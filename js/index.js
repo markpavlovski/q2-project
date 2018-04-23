@@ -117,7 +117,7 @@ function init() {
   pacman.add(MovingCube);
 
 
-  var colliderGeometry = new THREE.CubeGeometry(1, 50, 50, 10, 10, 10);
+  var colliderGeometry = new THREE.CubeGeometry(1, 50, 50, 5, 5, 5);
   var colliderMaterial = new THREE.MeshBasicMaterial({
     color: 0xfffff00,
     wireframe: false,
@@ -143,7 +143,7 @@ function init() {
   downCollider.rotation.y = Math.PI / 2
   pacman.add(downCollider);
 
-  var wallGeometry = new THREE.CubeGeometry(200, 50, 50, 1, 1, 1);
+  var wallGeometry = new THREE.CubeGeometry(200, 50, 50, 3, 3, 3);
   var wallMaterial = new THREE.MeshBasicMaterial({
     color: 0x8888ff
   });
@@ -291,12 +291,13 @@ function detectCollision(obj,direction){
       .reduce((acc, dist) => acc < dist ? acc : dist, Infinity)
 
   console.log(direction, distance);
-  // if (distance < COLLISION_THRESHOLD) availableDirections[direction]= false
   if (distance < Infinity){
     if (distance < COLLISION_THRESHOLD && lastDirection === direction) {
       appendText(" Hit ");
 			availableDirections[direction]= false
       obj.position.addScaledVector(unitDirections[direction], distance)
+    } else if (distance < COLLISION_THRESHOLD && lastDirection !== direction){
+      availableDirections[direction]= true
     }
   } else {
     availableDirections[direction]= true
