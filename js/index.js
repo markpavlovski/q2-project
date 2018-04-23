@@ -48,7 +48,8 @@ function init() {
     ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT,
     NEAR = 0.1,
     FAR = 20000;
-  camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+    // camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+    camera = new THREE.OrthographicCamera(-window.innerWidth/2, window.innerWidth/2, window.innerHeight/2, -window.innerHeight/2, NEAR, FAR);
   scene.add(camera);
   camera.position.set(0, 900, 0);
   camera.lookAt(scene.position);
@@ -147,7 +148,7 @@ function init() {
   downCollider.rotation.y = Math.PI / 2
   pacman.add(downCollider);
 
-  var wallGeometry = new THREE.CubeGeometry(150, 50, 50, 3, 3, 3);
+  var wallGeometry = new THREE.CubeGeometry(150, 50, 50, 1, 1, 1);
   var wallMaterial = new THREE.MeshBasicMaterial({
     color: 0x8888ff
   });
@@ -320,7 +321,7 @@ function detectCollision(obj,direction){
     if (distance < COLLISION_THRESHOLD && lastDirection === direction) {
       appendText(" Hit ");
 			availableDirections[direction]= false
-      obj.position.addScaledVector(unitDirections[direction], distance)
+      obj.position.addScaledVector(unitDirections[direction], distance-0.001)
     } else if (distance < COLLISION_THRESHOLD && lastDirection !== direction){
       availableDirections[direction]= true
     }
