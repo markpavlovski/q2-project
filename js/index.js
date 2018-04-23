@@ -142,7 +142,7 @@ function init() {
   downCollider.rotation.y = Math.PI / 2
   pacman.add(downCollider);
 
-  var wallGeometry = new THREE.CubeGeometry(100, 100, 20, 1, 1, 1);
+  var wallGeometry = new THREE.CubeGeometry(500, 50, 20, 1, 1, 1);
   var wallMaterial = new THREE.MeshBasicMaterial({
     color: 0x8888ff
   });
@@ -152,22 +152,45 @@ function init() {
   });
 
   var wall = new THREE.Mesh(wallGeometry, wallMaterial);
-  wall.position.set(100, 50, -100);
+  wall.position.set(100, 25, -100);
   scene.add(wall);
   collidableMeshList.push(wall);
   var wall = new THREE.Mesh(wallGeometry, wireMaterial);
-  wall.position.set(100, 50, -100);
+  wall.position.set(100, 25, -100);
   scene.add(wall);
 
   var wall2 = new THREE.Mesh(wallGeometry, wallMaterial);
-  wall2.position.set(-150, 50, 0);
+  wall2.position.set(-150, 25, 0);
   wall2.rotation.y = 3.14159 / 2;
   scene.add(wall2);
   collidableMeshList.push(wall2);
   var wall2 = new THREE.Mesh(wallGeometry, wireMaterial);
-  wall2.position.set(-150, 50, 0);
+  wall2.position.set(-150, 25, 0);
   wall2.rotation.y = 3.14159 / 2;
   scene.add(wall2);
+
+
+    var wall3 = new THREE.Mesh(wallGeometry, wallMaterial);
+    wall3.position.set(-37.85, 25, 0);
+    wall3.rotation.y = 3.14159 / 2;
+    scene.add(wall3);
+    collidableMeshList.push(wall3);
+    var wall3 = new THREE.Mesh(wallGeometry, wireMaterial);
+    wall3.position.set(-50, 25, 0);
+    wall3.rotation.y = 3.14159 / 2;
+    scene.add(wall3);
+
+
+    var wall3 = new THREE.Mesh(wallGeometry, wallMaterial);
+    wall3.position.set(37.9, 25, 0);
+    wall3.rotation.y = 3.14159 / 2;
+    scene.add(wall3);
+    collidableMeshList.push(wall3);
+    var wall3 = new THREE.Mesh(wallGeometry, wireMaterial);
+    wall3.position.set(37.85, 25, 0);
+    wall3.rotation.y = 3.14159 / 2;
+    scene.add(wall3);
+
 
 
 }
