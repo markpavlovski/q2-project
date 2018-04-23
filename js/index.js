@@ -318,7 +318,7 @@ function detectCollision(obj,direction){
 
   // console.log(direction, distance);
   if (distance < Infinity){
-    if (distance < COLLISION_THRESHOLD && lastDirection === direction) {
+    if (distance < COLLISION_THRESHOLD && lastDirection !== opposite(direction)) {
       appendText(" Hit ");
 			availableDirections[direction]= false
       obj.position.addScaledVector(unitDirections[direction], distance-0.001)
@@ -328,4 +328,12 @@ function detectCollision(obj,direction){
   } else {
     availableDirections[direction]= true
   }
+}
+
+
+function opposite(direction){
+  if (direction === 'left') return 'right'
+  if (direction === 'right') return 'left'
+  if (direction === 'up') return 'down'
+  if (direction === 'down') return 'up'
 }
