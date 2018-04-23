@@ -229,21 +229,8 @@ function update() {
 
   clearText();
 
+    addCollider(pacman,'left')
 
-    var ray = new THREE.Raycaster(pacman.position.clone().addScaledVector(unitDirections.left,25) , unitDirections.left);
-    var collisionResults = ray.intersectObjects(collidableMeshList);
-
-    if (collisionResults[0]){
-      console.log(collisionResults[0].distance)
-      if (collisionResults.length > 0 && collisionResults[0].distance < COLLISION_THRESHOLD && lastDirection === 'left') {
-        appendText(" Hit ");
-  			availableDirections.left= false
-        pacman.position.addScaledVector(unitDirections.left, collisionResults[0].distance)
-  			// use the distance here to go all the way!
-      }
-    } else {
-      availableDirections.left= true
-    }
 
 
   controls.update();
@@ -252,4 +239,24 @@ function update() {
 
 function render() {
   renderer.render(scene, camera);
+}
+
+
+
+function addCollider(obj,direction){
+
+
+    var ray = new THREE.Raycaster(obj.position.clone().addScaledVector(unitDirections[direction],25) , unitDirections[direction]);
+    var collisionResults = ray.intersectObjects(collidableMeshList);
+
+    if (collisionResults[0]){
+      console.log(collisionResults[0].distance)
+      if (collisionResults.length > 0 && collisionResults[0].distance < COLLISION_THRESHOLD && lastDirection === direction) {
+        appendText(" Hit ");
+  			availableDirections[direction]= false
+        obj.position.addScaledVector(unitDirections[direction], collisionResults[0].distance)
+      }
+    } else {
+      availableDirections[direction]= true
+    }
 }
