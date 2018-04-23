@@ -28,7 +28,7 @@ const availableDirections = {
 
 let lastDirection = null
 
-const COLLISION_THRESHOLD = 4
+const COLLISION_THRESHOLD = 5
 
 
 
@@ -115,7 +115,7 @@ function init() {
   pacman.add(MovingCube);
 
 
-  var colliderGeometry = new THREE.CubeGeometry(5, 50, 50, 8, 8, 8);
+  var colliderGeometry = new THREE.CubeGeometry(1, 50, 50, 1, 1, 1);
   var colliderMaterial = new THREE.MeshBasicMaterial({
     color: 0xfffff00,
     wireframe: false,
@@ -207,6 +207,7 @@ function update() {
   if (keyboard.pressed("right")) {
     pacman.position.x += moveDistance * availableDirections.right;
     lastDirection = 'right'
+    if (availableDirections.right) availableDirections.left = true
   }
   if (keyboard.pressed("up")) {
     pacman.position.z -= moveDistance * availableDirections.up;
@@ -228,13 +229,20 @@ function update() {
 
   clearText();
 
+
     var ray = new THREE.Raycaster(pacman.position.clone().addScaledVector(unitDirections.left,25) , unitDirections.left);
     var collisionResults = ray.intersectObjects(collidableMeshList);
-		console.log(collisionResults[0].distance)
 
-    if (collisionResults.length > 0 && collisionResults[0].distance < COLLISION_THRESHOLD) {
-      appendText(" Hit ");
-			availableDirections.left= false
+    if (collisionResults[0]){
+      console.log(collisionResults[0].distance)
+      if (collisionResults.length > 0 && collisionResults[0].distance < COLLISION_THRESHOLD && lastDirection === 'left') {
+        appendText(" Hit ");
+  			availableDirections.left= false
+        pacman.position.addScaledVector(unitDirections.left, collisionResults[0].distance)
+  			// use the distance here to go all the way!
+      }
+    } else {
+      availableDirections.left= true
     }
 
 
