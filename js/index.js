@@ -50,7 +50,7 @@ function init() {
     FAR = 20000;
   camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
   scene.add(camera);
-  camera.position.set(0, 150, 400);
+  camera.position.set(0, 900, 0);
   camera.lookAt(scene.position);
   var axesHelper = new THREE.AxesHelper(100);
   scene.add(axesHelper);
@@ -107,12 +107,16 @@ function init() {
   pacman.position.set(0, 25, 0)
   scene.add(pacman)
 
-  var cubeGeometry = new THREE.CubeGeometry(50, 50, 50, 1, 1, 1);
+  var cubeGeometry = new THREE.CylinderGeometry( 25, 25, 20, 32 );;
   var wireMaterial = new THREE.MeshBasicMaterial({
     color: 0xff0000,
     wireframe: true
   });
-  MovingCube = new THREE.Mesh(cubeGeometry, wireMaterial);
+  var pacmanMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffff00,
+      wireframe: false
+    });
+  MovingCube = new THREE.Mesh(cubeGeometry, pacmanMaterial);
   MovingCube.position.set(0, 0, 0);
   pacman.add(MovingCube);
 
@@ -143,13 +147,17 @@ function init() {
   downCollider.rotation.y = Math.PI / 2
   pacman.add(downCollider);
 
-  var wallGeometry = new THREE.CubeGeometry(200, 50, 50, 3, 3, 3);
+  var wallGeometry = new THREE.CubeGeometry(150, 50, 50, 3, 3, 3);
   var wallMaterial = new THREE.MeshBasicMaterial({
     color: 0x8888ff
   });
   var wireMaterial = new THREE.MeshBasicMaterial({
     color: 0x000000,
     wireframe: true
+  });
+  var pacmanMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffff00,
+    wireframe: false
   });
   //
   // var wall = new THREE.Mesh(wallGeometry, wallMaterial);
@@ -180,10 +188,27 @@ function init() {
     //     collidableMeshList.push(wall);
 
     // detectCollision(pacman,'left')
+
+    // center walls
     addWall(wallGeometry, wallMaterial, -75, 0, Math.PI/2)
     addWall(wallGeometry, wallMaterial, 75, 0, Math.PI/2)
-    addWall(wallGeometry, wallMaterial, 200, 150, Math.PI/2)
-    addWall(wallGeometry, wallMaterial, 200, -150, Math.PI/2)
+
+    // right from center walls
+    addWall(wallGeometry, wallMaterial, 200, 125, Math.PI/2)
+    addWall(wallGeometry, wallMaterial, 200, -125, Math.PI/2)
+
+    // left from center walls
+    addWall(wallGeometry, wallMaterial, -200, 125, Math.PI/2)
+    addWall(wallGeometry, wallMaterial, -200, -125, Math.PI/2)
+
+    // top horizontal line
+    addWall(wallGeometry, wallMaterial, -100, -175, 0)
+    addWall(wallGeometry, wallMaterial, 25, -175, 0)
+
+    // bottom horizontal line
+    addWall(wallGeometry, wallMaterial, -25, 175, 0)
+    addWall(wallGeometry, wallMaterial, 100, 175, 0)
+
 
 
 }
@@ -290,7 +315,7 @@ function detectCollision(obj,direction){
       .map(collisionResults => collisionResults[0] ? collisionResults[0].distance : Infinity)
       .reduce((acc, dist) => acc < dist ? acc : dist, Infinity)
 
-  console.log(direction, distance);
+  // console.log(direction, distance);
   if (distance < Infinity){
     if (distance < COLLISION_THRESHOLD && lastDirection === direction) {
       appendText(" Hit ");
