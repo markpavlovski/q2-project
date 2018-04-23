@@ -30,6 +30,7 @@ let lastDirection = null
 
 const COLLISION_THRESHOLD = 5
 let leftCollider, rightCollider, upCollider, downCollider
+const corridor = 55
 
 
 
@@ -125,20 +126,20 @@ function init() {
   });
 
   leftCollider = new THREE.Mesh(colliderGeometry, colliderMaterial);
-  leftCollider.position.set(-25, 0, 0);
+  leftCollider.position.set(-24.4999, 0, 0);
   pacman.add(leftCollider);
 
   rightCollider = new THREE.Mesh(colliderGeometry, colliderMaterial);
-  rightCollider.position.set(25, 0, 0);
+  rightCollider.position.set(24.4999, 0, 0);
   pacman.add(rightCollider);
 
   upCollider = new THREE.Mesh(colliderGeometry, colliderMaterial);
-  upCollider.position.set(0, 0, -25);
+  upCollider.position.set(0, 0, -24.4999);
   upCollider.rotation.y = Math.PI / 2
   pacman.add(upCollider);
 
   downCollider = new THREE.Mesh(colliderGeometry, colliderMaterial);
-  downCollider.position.set(0, 0, 25);
+  downCollider.position.set(0, 0, 24.4999);
   downCollider.rotation.y = Math.PI / 2
   pacman.add(downCollider);
 
@@ -150,47 +151,37 @@ function init() {
     color: 0x000000,
     wireframe: true
   });
+  //
+  // var wall = new THREE.Mesh(wallGeometry, wallMaterial);
+  // wall.position.set(100, 25, -100);
+  // scene.add(wall);
+  // collidableMeshList.push(wall);
+  //
+  //
+  // var wall2 = new THREE.Mesh(wallGeometry, wallMaterial);
+  // wall2.position.set(-150, 25, 0);
+  // wall2.rotation.y = 3.14159 / 2;
+  // scene.add(wall2);
+  // collidableMeshList.push(wall2);
 
-  var wall = new THREE.Mesh(wallGeometry, wallMaterial);
-  wall.position.set(100, 25, -100);
-  scene.add(wall);
-  collidableMeshList.push(wall);
-  var wall = new THREE.Mesh(wallGeometry, wireMaterial);
-  wall.position.set(100, 25, -100);
-  scene.add(wall);
-
-  var wall2 = new THREE.Mesh(wallGeometry, wallMaterial);
-  wall2.position.set(-150, 25, 0);
-  wall2.rotation.y = 3.14159 / 2;
-  scene.add(wall2);
-  collidableMeshList.push(wall2);
-  var wall2 = new THREE.Mesh(wallGeometry, wireMaterial);
-  wall2.position.set(-150, 25, 0);
-  wall2.rotation.y = 3.14159 / 2;
-  scene.add(wall2);
 
 
     var wall3 = new THREE.Mesh(wallGeometry, wallMaterial);
-    wall3.position.set(-37.85, 25, 0);
+    wall3.position.set(-35, 25, 0);
     wall3.rotation.y = 3.14159 / 2;
     scene.add(wall3);
     collidableMeshList.push(wall3);
-    var wall3 = new THREE.Mesh(wallGeometry, wireMaterial);
-    wall3.position.set(-50, 25, 0);
-    wall3.rotation.y = 3.14159 / 2;
-    scene.add(wall3);
+
 
 
     var wall3 = new THREE.Mesh(wallGeometry, wallMaterial);
-    wall3.position.set(37.9, 25, 0);
+    wall3.position.set(35, 25, 0);
     wall3.rotation.y = 3.14159 / 2;
     scene.add(wall3);
     collidableMeshList.push(wall3);
-    var wall3 = new THREE.Mesh(wallGeometry, wireMaterial);
-    wall3.position.set(37.85, 25, 0);
-    wall3.rotation.y = 3.14159 / 2;
-    scene.add(wall3);
 
+
+    // detectCollision(pacman,'left')
 
 
 }
@@ -257,10 +248,10 @@ function update() {
 
   clearText();
 
-  addCollider(pacman,'left')
-  addCollider(pacman,'right')
-  addCollider(pacman,'up')
-  addCollider(pacman,'down')
+  detectCollision(pacman,'left')
+  detectCollision(pacman,'right')
+  // detectCollision(pacman,'up')
+  // detectCollision(pacman,'down')
 
 
 
@@ -274,7 +265,7 @@ function render() {
 
 
 
-function addCollider(obj,direction){
+function detectCollision(obj,direction){
   // console.log(leftCollider.geometry.vertices)
   // console.log(obj.position)
   // console.log(leftCollider.geometry.vertices.map(vertex => vertex.clone().add(obj.position)))
@@ -291,9 +282,14 @@ function addCollider(obj,direction){
       .map(collisionResults => collisionResults[0] ? collisionResults[0].distance : Infinity)
       .reduce((acc, dist) => acc < dist ? acc : dist, Infinity)
 
-  // console.log(direction, distance);
+  console.log(direction, distance);
+  if (distance < COLLISION_THRESHOLD) availableDirections[direction]= false
   if (distance < Infinity){
-    if (distance < COLLISION_THRESHOLD && lastDirection === direction) {
+    if (!lastDirection){
+      obj.position.addScaledVector(unitDirections[direction], distance)
+      availableDirections[direction]= false
+      lastDirection = direction
+    } else if (distance < COLLISION_THRESHOLD && lastDirection === direction) {
       appendText(" Hit ");
 			availableDirections[direction]= false
       obj.position.addScaledVector(unitDirections[direction], distance)
