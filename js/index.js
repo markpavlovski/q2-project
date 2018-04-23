@@ -29,6 +29,7 @@ const availableDirections = {
 let lastDirection = null
 
 const COLLISION_THRESHOLD = 5
+let leftCollider, rightCollider, upCollider, downCollider
 
 
 
@@ -115,7 +116,7 @@ function init() {
   pacman.add(MovingCube);
 
 
-  var colliderGeometry = new THREE.CubeGeometry(1, 50, 50, 1, 1, 1);
+  var colliderGeometry = new THREE.CubeGeometry(1, 50, 50, 10, 10, 10);
   var colliderMaterial = new THREE.MeshBasicMaterial({
     color: 0xfffff00,
     wireframe: false,
@@ -131,15 +132,15 @@ function init() {
   rightCollider.position.set(25, 0, 0);
   pacman.add(rightCollider);
 
-  topCollider = new THREE.Mesh(colliderGeometry, colliderMaterial);
-  topCollider.position.set(0, 0, -25);
-  topCollider.rotation.y = Math.PI / 2
-  pacman.add(topCollider);
+  upCollider = new THREE.Mesh(colliderGeometry, colliderMaterial);
+  upCollider.position.set(0, 0, -25);
+  upCollider.rotation.y = Math.PI / 2
+  pacman.add(upCollider);
 
-  bottomCollider = new THREE.Mesh(colliderGeometry, colliderMaterial);
-  bottomCollider.position.set(0, 0, 25);
-  bottomCollider.rotation.y = Math.PI / 2
-  pacman.add(bottomCollider);
+  downCollider = new THREE.Mesh(colliderGeometry, colliderMaterial);
+  downCollider.position.set(0, 0, 25);
+  downCollider.rotation.y = Math.PI / 2
+  pacman.add(downCollider);
 
   var wallGeometry = new THREE.CubeGeometry(100, 100, 20, 1, 1, 1);
   var wallMaterial = new THREE.MeshBasicMaterial({
@@ -256,14 +257,18 @@ function addCollider(obj,direction){
   // console.log(leftCollider.geometry.vertices.map(vertex => vertex.clone().add(obj.position)))
   // console.log('!!!!!!!!');
 
-  const distance = leftCollider.geometry.vertices
+  const collider = {left: leftCollider,right: rightCollider,up: upCollider,down: downCollider}
+
+  // console.log(collider[direction].geometry.vertices.length);
+  const distance = collider[direction].geometry.vertices
       .map(relativeVertex => relativeVertex.clone().add(obj.position))
+      .map(absoluteVertex => (direction === 'left' || direction === 'right') ? absoluteVertex.addScaledVector(unitDirections[direction],25) : absoluteVertex)
       .map(absoluteVertex => new THREE.Raycaster(absoluteVertex, unitDirections[direction]) )
       .map(ray  => ray.intersectObjects(collidableMeshList))
       .map(collisionResults => collisionResults[0] ? collisionResults[0].distance : Infinity)
-      .reduce((acc, dist) => acc < dist ? acc : dist)
+      .reduce((acc, dist) => acc < dist ? acc : dist, Infinity)
 
-  console.log(distance);
+  // console.log(direction, distance);
   if (distance < Infinity){
     if (distance < COLLISION_THRESHOLD && lastDirection === direction) {
       appendText(" Hit ");
