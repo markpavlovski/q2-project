@@ -15,8 +15,8 @@ var arrowList = [];
 var unitDirections = {
   left: new THREE.Vector3(-1, 0, 0),
   right: new THREE.Vector3(1, 0, 0),
-  up: new THREE.Vector3(0, 0, 1),
-  down: new THREE.Vector3(0, 0, -1)
+  up: new THREE.Vector3(0, 0, -1),
+  down: new THREE.Vector3(0, 0, 1)
 }
 
 const availableDirections = {
@@ -203,6 +203,7 @@ function update() {
   if (keyboard.pressed("left")) {
     pacman.position.x -= moveDistance * availableDirections.left;
     lastDirection = 'left'
+    if (availableDirections.left) availableDirections.right = true
   }
   if (keyboard.pressed("right")) {
     pacman.position.x += moveDistance * availableDirections.right;
@@ -212,11 +213,14 @@ function update() {
   if (keyboard.pressed("up")) {
     pacman.position.z -= moveDistance * availableDirections.up;
     lastDirection = 'up'
+    if (availableDirections.up) availableDirections.down = true
+
 
   }
   if (keyboard.pressed("down")) {
     pacman.position.z += moveDistance * availableDirections.down;
     lastDirection = 'down'
+    if (availableDirections.down) availableDirections.up = true
   }
 
   // collision detection:
@@ -229,7 +233,10 @@ function update() {
 
   clearText();
 
-    addCollider(pacman,'left')
+  addCollider(pacman,'left')
+  addCollider(pacman,'right')
+  addCollider(pacman,'up')
+  addCollider(pacman,'down')
 
 
 
@@ -244,19 +251,26 @@ function render() {
 
 
 function addCollider(obj,direction){
+  // console.log(leftCollider.geometry.vertices)
+  // console.log(obj.position)
+  // console.log(leftCollider.geometry.vertices.map(vertex => vertex.clone().add(obj.position)))
+  // console.log('!!!!!!!!');
 
+  const distance = leftCollider.geometry.vertices
+      .map(relativeVertex => relativeVertex.clone().add(obj.position))
+      .map(absoluteVertex => new THREE.Raycaster(absoluteVertex, unitDirections[direction]) )
+      .map(ray  => ray.intersectObjects(collidableMeshList))
+      .map(collisionResults => collisionResults[0] ? collisionResults[0].distance : Infinity)
+      .reduce((acc, dist) => acc < dist ? acc : dist)
 
-    var ray = new THREE.Raycaster(obj.position.clone().addScaledVector(unitDirections[direction],25) , unitDirections[direction]);
-    var collisionResults = ray.intersectObjects(collidableMeshList);
-
-    if (collisionResults[0]){
-      console.log(collisionResults[0].distance)
-      if (collisionResults.length > 0 && collisionResults[0].distance < COLLISION_THRESHOLD && lastDirection === direction) {
-        appendText(" Hit ");
-  			availableDirections[direction]= false
-        obj.position.addScaledVector(unitDirections[direction], collisionResults[0].distance)
-      }
-    } else {
-      availableDirections[direction]= true
+  console.log(distance);
+  if (distance < Infinity){
+    if (distance < COLLISION_THRESHOLD && lastDirection === direction) {
+      appendText(" Hit ");
+			availableDirections[direction]= false
+      obj.position.addScaledVector(unitDirections[direction], distance)
     }
+  } else {
+    availableDirections[direction]= true
+  }
 }
