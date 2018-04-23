@@ -104,7 +104,7 @@ function init() {
   // CUSTOM //
   ////////////
 
-  pacman.position.set(0, 25.1, 0)
+  pacman.position.set(0, 25, 0)
   scene.add(pacman)
 
   var cubeGeometry = new THREE.CubeGeometry(50, 50, 50, 1, 1, 1);
@@ -143,7 +143,7 @@ function init() {
   downCollider.rotation.y = Math.PI / 2
   pacman.add(downCollider);
 
-  var wallGeometry = new THREE.CubeGeometry(500, 50, 20, 1, 1, 1);
+  var wallGeometry = new THREE.CubeGeometry(200, 50, 50, 1, 1, 1);
   var wallMaterial = new THREE.MeshBasicMaterial({
     color: 0x8888ff
   });
@@ -165,23 +165,25 @@ function init() {
   // collidableMeshList.push(wall2);
 
 
-
-    var wall3 = new THREE.Mesh(wallGeometry, wallMaterial);
-    wall3.position.set(-35, 25, 0);
-    wall3.rotation.y = 3.14159 / 2;
-    scene.add(wall3);
-    collidableMeshList.push(wall3);
-
-
-
-    var wall3 = new THREE.Mesh(wallGeometry, wallMaterial);
-    wall3.position.set(35, 25, 0);
-    wall3.rotation.y = 3.14159 / 2;
-    scene.add(wall3);
-    collidableMeshList.push(wall3);
-
+    //
+    // var wall = new THREE.Mesh(wallGeometry, wallMaterial);
+    // wall.position.set(-50, 25, 0);
+    // wall.rotation.y = 3.14159 / 2;
+    // scene.add(wall);
+    // collidableMeshList.push(wall);
+    //
+    //
+    //     var wall = new THREE.Mesh(wallGeometry, wallMaterial);
+    //     wall.position.set(50, 25, 0);
+    //     wall.rotation.y = 3.14159 / 2;
+    //     scene.add(wall);
+    //     collidableMeshList.push(wall);
 
     // detectCollision(pacman,'left')
+    addWall(wallGeometry, wallMaterial, -75, 0, Math.PI/2)
+    addWall(wallGeometry, wallMaterial, 75, 0, Math.PI/2)
+    addWall(wallGeometry, wallMaterial, 200, 150, Math.PI/2)
+    addWall(wallGeometry, wallMaterial, 200, -150, Math.PI/2)
 
 
 }
@@ -250,8 +252,8 @@ function update() {
 
   detectCollision(pacman,'left')
   detectCollision(pacman,'right')
-  // detectCollision(pacman,'up')
-  // detectCollision(pacman,'down')
+  detectCollision(pacman,'up')
+  detectCollision(pacman,'down')
 
 
 
@@ -263,7 +265,13 @@ function render() {
   renderer.render(scene, camera);
 }
 
-
+function addWall(wallGeometry, wallMaterial, x, z, rotation){
+  const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+  wall.position.set(x, 25, z);
+  wall.rotation.y = rotation;
+  scene.add(wall);
+  collidableMeshList.push(wall);
+}
 
 function detectCollision(obj,direction){
   // console.log(leftCollider.geometry.vertices)
@@ -283,13 +291,9 @@ function detectCollision(obj,direction){
       .reduce((acc, dist) => acc < dist ? acc : dist, Infinity)
 
   console.log(direction, distance);
-  if (distance < COLLISION_THRESHOLD) availableDirections[direction]= false
+  // if (distance < COLLISION_THRESHOLD) availableDirections[direction]= false
   if (distance < Infinity){
-    if (!lastDirection){
-      obj.position.addScaledVector(unitDirections[direction], distance)
-      availableDirections[direction]= false
-      lastDirection = direction
-    } else if (distance < COLLISION_THRESHOLD && lastDirection === direction) {
+    if (distance < COLLISION_THRESHOLD && lastDirection === direction) {
       appendText(" Hit ");
 			availableDirections[direction]= false
       obj.position.addScaledVector(unitDirections[direction], distance)
